@@ -1,30 +1,31 @@
 package br.ufpb.dcx.dsc.figurinhas.services;
 
-import br.ufpb.dcx.dsc.figurinhas.models.Album;
-import br.ufpb.dcx.dsc.figurinhas.models.Figurinha;
 import br.ufpb.dcx.dsc.figurinhas.models.Photo;
 import br.ufpb.dcx.dsc.figurinhas.models.User;
 import br.ufpb.dcx.dsc.figurinhas.repository.AlbumRepository;
 import br.ufpb.dcx.dsc.figurinhas.repository.FigurinhaRepository;
 import br.ufpb.dcx.dsc.figurinhas.repository.PhotoRepository;
 import br.ufpb.dcx.dsc.figurinhas.repository.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
+
     private UserRepository userRepository;
     private PhotoRepository photoRepository;
-
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     private AlbumRepository albumRepository;
     private FigurinhaRepository figurinhaRepository;
 
-    public UserService(FigurinhaRepository figurinhaRepository, AlbumRepository albumRepository, UserRepository userRepository, PhotoRepository photoRepository){
+    public UserService(UserRepository userRepository, PhotoRepository photoRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AlbumRepository albumRepository, FigurinhaRepository figurinhaRepository) {
         this.userRepository = userRepository;
         this.photoRepository = photoRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.albumRepository = albumRepository;
         this.figurinhaRepository = figurinhaRepository;
     }
@@ -40,7 +41,7 @@ public class UserService {
     }
 
     public User createUser(User user){
-
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         Photo photo = new Photo("www.exemplo.com/foto.png");
         photoRepository.save(photo);
         user.setPhoto(photo);
@@ -82,6 +83,13 @@ public class UserService {
         }
 
             */
+    }
+    public void changePassword(String username, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+
+        userRepository.save(user);
     }
 
 //    public Album share(Long albumId, Long userId, Long figId){

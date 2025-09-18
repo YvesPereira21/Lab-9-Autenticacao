@@ -3,6 +3,7 @@ package br.ufpb.dcx.dsc.figurinhas.dto;
 import br.ufpb.dcx.dsc.figurinhas.models.Photo;
 import br.ufpb.dcx.dsc.figurinhas.models.User;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -13,8 +14,13 @@ public class UserDTO {
     private String nome;
     @Email
     private String email;
-
     private Photo photo;
+    @NotBlank
+    private String username;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank
+    private String password;
+
 
     public UserDTO(){}
 
@@ -48,6 +54,22 @@ public class UserDTO {
 
     public void setPhoto(Photo photo) {
         this.photo = photo;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
